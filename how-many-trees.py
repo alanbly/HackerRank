@@ -34,7 +34,7 @@ def treeBrute(N, L) :
   if N - L == 1 :
     return long(N%modVal)
   if L == 2 :
-    return long(factorial(N)/2%modVal)
+    return long(math.factorial(N)/2%modVal)
   prufers = trees(N)
   return long(sum([1 if countLeaves(i) == L else 0 for i in prufers]) % modVal);
 
@@ -79,7 +79,7 @@ def treeRecurse(N, L, branches = {}, partitions = {}) :
     return long(N%modVal)
   if L == 2 : 
     branches[N][L] = []
-    return long(factorial(N)/2%modVal)
+    return long(math.factorial(N)/2%modVal)
   oneLess = treeRecurse(N-1, L, branches, partitions)
   newNode = treeRecurse(N-1, L-1, branches, partitions)
   branches[N][L] = []
@@ -110,6 +110,8 @@ def modSum(values) :
 def completePermutation(length, items, memo = {}) :
   if length not in memo :
     memo[length] = {}
+  elif items in memo[length] :
+    return memo[length][items]
   if items == 1 :
     return 1
   if items > length :
@@ -128,18 +130,18 @@ def treeSmart(N, L) :
   if N - L == 1 :
     return long(N%modVal)
   if L == 2 :
-    return long(factorial(N)/2%modVal)
+    return long(math.factorial(N)/2%modVal)
   return long(treesWithLeaves(N, L) % modVal);
 
-treeSmart(4, 2);     #12
-treeSmart(4, 3);     #4
-treeSmart(5, 2);     #60
-treeSmart(5, 3);     #60
-treeSmart(5, 4);     #5
-treeSmart(8, 4);     #109200
-treeSmart(1000, 16); #421013870
+# treeSmart(4, 2);     #12
+# treeSmart(4, 3);     #4
+# treeSmart(5, 2);     #60
+# treeSmart(5, 3);     #60
+# treeSmart(5, 4);     #5
+# treeSmart(8, 4);     #109200
+# treeSmart(1000, 16); #421013870
 
 
 (N,L) = [long(i) for i in raw_input().split(" ")]
 
-print treeBrute(N, L)
+print treeSmart(N, L)
