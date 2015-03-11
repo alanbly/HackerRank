@@ -117,9 +117,6 @@ def completePermutation(length, items, memo = {}) :
   if items > length :
     return 0
   total = pow(items, length, modVal)
-  for i in range(items) :
-    choose(items, i)
-    completePermutation(length, i, memo)
   memo[length][items] = (total-modSum(choose(items, i)*completePermutation(length, i, memo) for i in range(items)))%modVal
   return memo[length][items]
 
