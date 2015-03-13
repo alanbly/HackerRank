@@ -17,7 +17,7 @@ def buildTree(nodes, adjacencies) :
       distance[i] = 1+distance[next]
     visited.add(next)
     toVisit |= newNodes
-  tree = dict((i, []) for i in range(1,nodes+1))
+  tree = [[] for i in range(nodes+1)]
   for (a, b) in adjacencies :
     if distance[a] < distance[b] :
       tree[a].append(b)
@@ -38,8 +38,8 @@ def buildTree(nodes, adjacencies) :
 
 def buildPaths(tree) :
   paths = [None for i in range(len(tree)+1)]
-  for (node, children) in tree.items() :
-    for i in children :
+  for node in range(len(tree)) :
+    for i in tree[node] :
       paths[i] = node
   return paths
 
@@ -94,16 +94,10 @@ def getPath(paths, node, memo = {}) :
 def maxPath(paths, values, a, b, memoParent, memoPath) :
   (pathA, pathB) = (getPath(paths, a, memoPath), getPath(paths, b, memoPath))
   lastCommon = 1
-  if b in memoParent[a] :
-    lastCommon = memoParent[a][b]
-  else :
-    shortest = min(len(pathA), len(pathB))
-    while lastCommon < shortest and pathA[lastCommon] == pathB[lastCommon] :
-      lastCommon += 1
-    lastCommon -= 1
-    memoParent[a][b] = lastCommon
-    memoParent[b][a] = lastCommon
-    print "%d %d %d %d %d" % (a, b, lastCommon, len(pathA), len(pathB))
+  shortest = min(len(pathA), len(pathB))
+  while lastCommon < shortest and pathA[lastCommon] == pathB[lastCommon] :
+    lastCommon += 1
+  lastCommon -= 1
   return max(max(values[i] for i in pathA[lastCommon:]), max(values[i] for i in pathB[lastCommon:]))
 
 nodes = long(raw_input())
