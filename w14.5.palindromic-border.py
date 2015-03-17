@@ -2,11 +2,15 @@
 
 modVal = 10**9+7
 
-def isPalindrome(num) :
-  string = str(num)
-  bottomHalf = len(string)/2
-  topHalf = (len(string)-1)/2
-  return string[:bottomHalf] == string[:topHalf:-1]
+def isPalindrome(string, start, end) :
+  half = (end-start+1)/2
+  # print "%d %d %d"%(start, half, end)
+  for i in range(half) :
+    if string[start + i] != string[end-i-1] :
+      return False
+  return True
+
+# isPalindrome("acba", 0, 4)
 
 
 def countPalindromesBad(string) :
@@ -17,38 +21,50 @@ def countPalindromesBad(string) :
 # countPalindromesBad("lololo") # 3
 
 
-def countPalindromes(string) :
-  longest = len(string)
-  while not isPalindrome(string[:longest]) :
+def countPalindromes(string, start, end) :
+  longest = end
+  while not isPalindrome(string, start, longest) :
     longest -= 1
-  return sum(1 for i in range(0,len(string)) if string[i] == string[0] and isPalindrome(string[:i+1])) # 24s
+  return sum(1 for i in range(start,end) if string[i] == string[start] and isPalindrome(string, start, i+1)) # 24s
 
-# countPalindromes("a") # 1
-# countPalindromes("abab") # 2
-# countPalindromes("lololo") # 3
+# countPalindromes("a", 0, 1) # 1
+# countPalindromes("abab", 0, 4) # 2
+# countPalindromes("lololo", 0, 6) # 3
+# countPalindromes("lololol", 0, 6) # 3
 
 
-def getBorders(string) :
-  biggest = 0
-  limit = len(string)
-  # print limit
-  while biggest < limit and string[biggest] == string[-1-biggest] :
-    # print "%s = %s" % (string[biggest], string[-1-biggest])
+def getBorders(string, start, end) :
+  biggest = start
+  offset = end+start-1
+  while biggest < end and string[biggest] == string[offset-biggest] :
     biggest += 1;
-  # print biggest
-  # print string[:biggest]
-  return 0 if biggest == 0 else countPalindromes(string[:min(limit,biggest+1)-1]) % modVal # 12s
+  return 0 if biggest == 0 else countPalindromes(string, start, min(end,biggest+1)-1) % modVal # 12s
 
-# getBorders("abca") # 1
-# getBorders("ababa") # 2
-# getBorders("lololol") # 3
+# getBorders("abca", 0, 4) # 1
+# getBorders("ababa", 0, 5) # 2
+# getBorders("lololol", 0, 7) # 3
+# getBorders("ababa", 1, 4) # 1
+# getBorders("abcacb", 1, 6) # 1
+# getBorders("abcacb", 0, 4) # 1
 
 
-def substrings(string) :
+def substringsBad(string) :
   for i in range(len(string)) :
     for j in range(len(string), i+1, -1) :
       if string[i] == string[j-1] : 
         yield string[i:j] # 11 sec if we limit to 8 chars
+
+# tuple(substrings("abcacb"))
+
+
+def substrings(string) :
+  if len(string) == 1 :
+    yield string
+    return
+  for i in range(len(string)) : # reduce 10x gets a 5x speedup
+    for j in range(len(string), i+1, -1) : # reduce 10x gets a 80x speedup
+      if string[i] == string[j-1] : 
+        yield (i,j) # 11 sec if we limit to 8 chars
 
 # tuple(substrings("abcacb"))
 
@@ -65,17 +81,18 @@ def palindromicBordersBad(string) :
 
 
 def palindromicBorders(string) :
-  return sum(map(getBorders, substrings(string))) % modVal
+  return sum(getBorders(string, i[0], i[1]) for i in substrings(string)) % modVal
 
-start = time()
+# start = time()
 # palindromicBorders("abcacb") # 3
 # palindromicBorders("ababa") # 5
 # palindromicBorders("".join(["abcdefgh"[randint(0,7)] for i in range(10**3)])) # ~0.4 sec
-palindromicBorders("".join(["abcdefgh"[randint(0,7)] for i in range(10**4)])) # ~40 sec
-# palindromicBorders("".join(["abcdefgh"[randint(0,7)] for i in range(10**5)])) # ~40 sec
-time() - start
+# palindromicBorders("".join(["abcdefgh"[randint(0,7)] for i in range(10**4)])) # ~40 sec
+# palindromicBorders("".join(["abcdefgh"[randint(0,7)] for i in range(10**5)])) # ~2156 sec
+# time() - start
 
 
 string = raw_input()
 
 print palindromicBorders(string)
+
